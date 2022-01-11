@@ -1,0 +1,88 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+ http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+ http://camel.apache.org/schema/spring
+ http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <bean id="percentCalculator" class="com.cameldemo.rabbitmq.CustomProcessor"></bean>
+
+    <camelContext xmlns = "http://camel.apache.org/schema/spring">
+
+        <dataFormats>
+            <bindy id="bindyDataformat" type="Csv" classType="com.cameldemo.rabbitmq.Student"/>
+        </dataFormats>
+
+        <!--
+        <route>
+            <from uri = "file:/home/cameldemo/inputbox?noop=true"/>
+            <unmarshal ref="bindyDataformat" />
+            <process ref="percentCalculator"/>
+            <log message="content is ${body}" />
+            <marshal><json/></marshal>
+            <to uri = "rabbitmq:host.docker.internal:5672/myexchange?username=guest&amp;password=guest&amp;autoDelete=false&amp;queue=myqueue"/>
+        </route>
+
+        <route>
+            <from uri = "rabbitmq:host.docker.internal:5672/myexchange?username=guest&amp;password=guest&amp;autoDelete=false&amp;queue=myqueue"/>
+            <to uri = "file:/home/cameldemo/outbox?noop=true"/>
+        </route>
+        -->
+
+        <route>
+        <from uri = "rabbitmq:localhost:5672/myexchange?username=guest&amp;password=guest&amp;autoDelete=false&amp;queue=myqueue"/>
+        <to uri="note://validate?day=11&amp;month=1&amp;year=2021" />
+        <to uri="note://transform?day=11&amp;month=1&amp;year=2021" />
+        <log message="content iss ${body}" />
+        <to uri = "file:/Users/pgadge/Documents/Project_Notes/Apache_Camel/sam/"/>
+        </route>
+
+    </camelContext>
+
+</beans>
+<!--
+ <from uri = "file:/home/cameldemo/inputbox?noop=true"/>
+<to uri = "rabbitmq:rabbitmq1:5672/myexchange?username=guest&amp;password=guest&amp;autoDelete=false&amp;queue=myqueue"/>
+?fileName=students.csv&amp;
+-->
+
+<!--Use for local (without docker)  File->File(json)->RabbitMQ
+<route>
+            <from uri = "file:/Users/pgadge/Documents/Project_Notes/Apache_Camel/camlvol/inputbox?noop=true"/>
+            <unmarshal>
+                <csv/>
+            </unmarshal>
+            <process ref="percentCalculator"/>
+            <log message="content is ${body}" />
+            <marshal><json/></marshal>
+            <to uri = "file:/Users/pgadge/Documents/Project_Notes/Apache_Camel/camlvol/outbox"/>
+        </route>
+
+        <route>
+            <from uri = "file:/Users/pgadge/Documents/Project_Notes/Apache_Camel/camlvol/outbox?noop=true"/>
+            <to uri = "rabbitmq:localhost:5672/myexchange?username=guest&amp;password=guest&amp;autoDelete=false&amp;queue=myqueue"/>
+        </route>
+
+        File ->RabbitMQ->File
+         <route>
+            <from uri = "file:/Users/pgadge/Documents/Project_Notes/Apache_Camel/camlvol/inputbox/?noop=true"/>
+            <unmarshal ref="bindyDataformat" />
+            <process ref="percentCalculator"/>
+            <log message="content is ${body}" />
+            <marshal><json/></marshal>
+            <to uri = "rabbitmq:localhost:5672/myexchange?username=guest&amp;password=guest&amp;autoDelete=false&amp;queue=myqueue"/>
+        </route>
+
+        <route>
+            <from uri = "rabbitmq:localhost:5672/myexchange?username=guest&amp;password=guest&amp;autoDelete=false&amp;queue=myqueue"/>
+            <to uri = "file:/Users/pgadge/Documents/Project_Notes/Apache_Camel/camlvol/outbox?noop=true"/>
+        </route>
+
+     <bean id="jsonDataformat" class="org.apache.camel.model.dataformat.JsonDataFormat">
+        <property name="unmarshalType" value="java.util.Map" />
+        <property name="library" value="Jackson"></property>
+    </bean>
+
+-->
+
